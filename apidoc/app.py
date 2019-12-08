@@ -1,11 +1,13 @@
-from flask import Flask, jsonify, render_template
+from flask import Flask
 from marshmallow import Schema, fields
 
 from . import doc
 
+
 # Optional Flask support
 app = Flask(__name__)
 app.config["DEBUG"] = True
+doc.init_app(app)
 
 
 class GistParameter(Schema):
@@ -33,16 +35,6 @@ def get_gist(gist_id):
 def post_gist():
     """Post a gist."""
     return '', 200
-
-
-@app.route('/apidocs/')
-def apidocs():
-    return render_template('index.html')
-
-
-@app.route('/apidocs/spec.json')
-def json_spec():
-    return jsonify(doc.get_spec(app))
 
 
 app.run()

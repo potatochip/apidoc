@@ -1,6 +1,8 @@
+from collections import defaultdict
+
 from apispec import APISpec
 from apispec.ext.marshmallow import MarshmallowPlugin
-from collections import defaultdict
+from flask import jsonify, render_template
 
 spec = APISpec(
     title="Gisty",
@@ -96,6 +98,7 @@ def _make_parameters(arguments):
         for arg in arguments
     ]
 
+
 EXCLUDE = {'HEAD', 'OPTIONS'}
 
 def _make_operations(methods, view):
@@ -114,3 +117,13 @@ def _split_docstring(func):
         description = docstring[first_new_line:].strip()
         return summary, description
     return docstring, ''
+
+
+def init_app(app):
+    @app.route('/apidocs/')
+    def apidocs():
+        return render_template('index.html')
+
+    @app.route('/apidocs/spec.json')
+    def json_spec():
+        return jsonify(get_spec(app))
