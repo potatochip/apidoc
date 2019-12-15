@@ -1,13 +1,16 @@
 from flask import Flask
 from marshmallow import Schema, fields
 
-from . import doc
+from .doc import Doc
 
 
-# Optional Flask support
 app = Flask(__name__)
 app.config["DEBUG"] = True
-doc.init_app(app)
+app.config['apidoc'] = dict(
+    title='Gisty',
+    info={'description': 'A minimal gist API'}
+)
+doc = Doc(app)
 
 
 class GistParameter(Schema):
