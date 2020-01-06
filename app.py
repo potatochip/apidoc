@@ -1,15 +1,17 @@
+"""Example app."""
 from flask import Flask
 from marshmallow import Schema, fields
 
-from .doc import Doc
+from apidoc import Doc
 
 
 app = Flask(__name__)
-app.config["DEBUG"] = True
+app.config['DEBUG'] = True
 app.config['apidoc'] = dict(
     title='Gisty',
     info={'description': 'A minimal gist API'}
 )
+
 doc = Doc(app)
 
 
