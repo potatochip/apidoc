@@ -39,7 +39,7 @@
     window.onload = function() {
       // Begin Swagger UI call region
       const ui = SwaggerUIBundle({
-        url: "{{ url_for('json_spec') }}",
+        url: "{{ url_for('apidoc.json_spec') }}",
         dom_id: '#swagger-ui',
         deepLinking: true,
         presets: [

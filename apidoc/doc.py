@@ -2,32 +2,44 @@ from collections import defaultdict
 
 from apispec import APISpec
 from apispec.ext.marshmallow import MarshmallowPlugin
-from flask import jsonify, render_template
+from flask import Blueprint, jsonify, render_template
 
 
 class Doc(object):
     exclude = {'HEAD', 'OPTIONS'}
 
     def __init__(self, app=None, config=None):
+        self.app = app
+        self.config = config or dict()
         self._spec = None
         self._views = defaultdict(dict)
-        self.app = app
         if app is not None:
-            self.init_app(app=app)
+            self.init_app(app)
 
     def init_app(self, app):
         self._spec = self._init_spec()
-        app.add_url_rule('/apidocs/', 'apidocs',
-                         lambda: render_template('index.html'))
-        app.add_url_rule('/apidocs/spec.json', 'json_spec',
-                         self._get_spec)
+        self._register_routes()
 
     def _init_spec(self):
         config = dict(title='ApiDoc',
                       version='1.0.0',
                       openapi_version='3.0.2')
         config.update(self.app.config.get('apidoc', {}))
+        config.update(self.config)
         return APISpec(plugins=[MarshmallowPlugin()], **config)
+
+    def _register_routes(self):
+        blueprint = Blueprint('apidoc', __name__,
+                              static_folder='./static',
+                              static_url_path='/docs/static',
+                              template_folder='./templates')
+
+        blueprint.add_url_rule('/docs/', 'apidocs',
+                               lambda: render_template('index.html'))
+        blueprint.add_url_rule('/docs/spec.json', 'json_spec',
+                               self._get_spec)
+
+        self.app.register_blueprint(blueprint)
 
     def _get_spec(self):
         for rule in self.app.url_map.iter_rules():
